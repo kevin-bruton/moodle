@@ -1,0 +1,24 @@
+::Test multiple::
+This is the question
+{
+=First answer: correct # Hello
+~Second answer #
+=Third answer: correct #
+~Fourth answer #
+}
+
+::Un verdadero falso::
+Hi there jack. You're the best! {F} 
+
+::Another multiple test question::
+What are typical Australian animals?
+{
+~Elephant #They're in Africa
+=Kangaroo #That's right
+~Dolphin #No
+=Koala #Great!
+}
+
+::Ensayo::
+Tienes que escribir un correo electrónico. {} 
+

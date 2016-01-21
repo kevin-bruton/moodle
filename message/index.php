@@ -200,6 +200,11 @@ if ($currentuser && !empty($user2) && has_capability('moodle/site:sendmessage', 
     if (message_is_user_non_contact_blocked($user2, $user1)) {
         $messageerror = get_string('userisblockingyounoncontact', 'message', fullname($user2));
     }
+    
+///////////////////////// KEV'S HACK: TO DISABLE MESSAGE SENDING BETWEEN STUDENTS    
+if ((!user_has_role_assignment($user1->id,3)) && (!user_has_role_assignment($user2->id,3)))
+	$messageerror = "Sólo puede mandar mensajes a profesores.";
+///////////////////////// END KEV'S HACK
 
     if (empty($messageerror)) {
         $mform = new send_form();

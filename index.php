@@ -323,4 +323,7 @@ foreach (explode(',', $frontpagelayout) as $v) {
 if ($editing && has_capability('moodle/course:create', context_system::instance())) {
     echo $courserenderer->add_new_course_button();
 }
+/////////// KEV'S HACK
+echo "<p style='text-align: center'>Acceder a <a href='../tareas/index.php'>las tareas de los alumnos</a></p>";
+/////////// END KEV'S HACK
 echo $OUTPUT->footer();

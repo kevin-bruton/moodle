@@ -208,11 +208,10 @@ class core_cohort_external extends external_api {
         return new external_function_parameters(
             array(
                 'cohortids' => new external_multiple_structure(new external_value(PARAM_INT, 'Cohort ID')
-                    , 'List of cohort id. A cohort id is an integer.'),
+                    , 'List of cohort id. A cohort id is an integer.', VALUE_DEFAULT, array()),
             )
         );
     }
-
     /**
      * Get cohorts definition specified by ids
      *
@@ -220,16 +219,16 @@ class core_cohort_external extends external_api {
      * @return array of cohort objects (id, courseid, name)
      * @since Moodle 2.5
      */
-    public static function get_cohorts($cohortids) {
+    public static function get_cohorts($cohortids = array()) {
         global $DB;
-
         $params = self::validate_parameters(self::get_cohorts_parameters(), array('cohortids' => $cohortids));
-
-        $cohorts = array();
-        foreach ($params['cohortids'] as $cohortid) {
-            // Validate params.
-            $cohort = $DB->get_record('cohort', array('id' => $cohortid), '*', MUST_EXIST);
-
+        if (empty($cohortids)) {
+            $cohorts = $DB->get_records('cohort');
+        } else {
+            $cohorts = $DB->get_records_list('cohort', 'id', $params['cohortids']);
+        }
+        $cohortsinfo = array();
+        foreach ($cohorts as $cohort) {
             // Now security checks.
             $context = context::instance_by_id($cohort->contextid, MUST_EXIST);
             if ($context->contextlevel != CONTEXT_COURSECAT and $context->contextlevel != CONTEXT_SYSTEM) {
@@ -239,15 +238,12 @@ class core_cohort_external extends external_api {
             if (!has_any_capability(array('moodle/cohort:manage', 'moodle/cohort:view'), $context)) {
                 throw new required_capability_exception($context, 'moodle/cohort:view', 'nopermissions', '');
             }
-
             list($cohort->description, $cohort->descriptionformat) =
                 external_format_text($cohort->description, $cohort->descriptionformat,
                         $context->id, 'cohort', 'description', $cohort->id);
-
-            $cohorts[] = (array) $cohort;
+            $cohortsinfo[] = (array) $cohort;
         }
-
-        return $cohorts;
+        return $cohortsinfo;
     }
 
     /**

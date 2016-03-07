@@ -147,7 +147,7 @@ class core_group_external extends external_api {
         return new external_function_parameters(
             array(
                 'groupids' => new external_multiple_structure(new external_value(PARAM_INT, 'Group ID')
-                        ,'List of group id. A group id is an integer.'),
+                        , 'List of group id. A group id is an integer.', VALUE_DEFAULT, array()),
             )
         );
     }
@@ -159,14 +159,19 @@ class core_group_external extends external_api {
      * @return array of group objects (id, courseid, name, enrolmentkey)
      * @since Moodle 2.2
      */
-    public static function get_groups($groupids) {
+    public static function get_groups($groupids = array()) {
+        global $DB;
         $params = self::validate_parameters(self::get_groups_parameters(), array('groupids'=>$groupids));
 
         $groups = array();
-        foreach ($params['groupids'] as $groupid) {
-            // validate params
-            $group = groups_get_group($groupid, 'id, courseid, name, description, descriptionformat, enrolmentkey', MUST_EXIST);
+        if (empty($groupids)) {
+            $groups = $DB->get_records('groups');
+        } else {
+            $groups = $DB->get_records_list('groups', 'id', $params['groupids']);
+        }
 
+        $groupsinfo = array();
+        foreach ($groups as $group) {
             // now security checks
             $context = context_course::instance($group->courseid, IGNORE_MISSING);
             try {
@@ -183,10 +188,10 @@ class core_group_external extends external_api {
                 external_format_text($group->description, $group->descriptionformat,
                         $context->id, 'group', 'description', $group->id);
 
-            $groups[] = (array)$group;
+            $groupsinfo[] = (array)$group;
         }
 
-        return $groups;
+        return $groupsinfo;
     }
 
     /**

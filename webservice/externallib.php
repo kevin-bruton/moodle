@@ -196,6 +196,9 @@ class core_webservice_external extends external_api {
         // User home page.
         $siteinfo['userhomepage'] = get_home_page();
 
+        // Roles in the system.
+        $siteinfo['roles'] = role_fix_names(get_all_roles(), $systemcontext, ROLENAME_ORIGINAL);
+
         return $siteinfo;
     }
 
@@ -257,7 +260,19 @@ class core_webservice_external extends external_api {
                                             VALUE_OPTIONAL),
                 'userhomepage' => new external_value(PARAM_INT,
                                                         'the default home page for the user: 0 for the site home, 1 for dashboard',
-                                                        VALUE_OPTIONAL)
+                                                        VALUE_OPTIONAL),
+                'roles' => new external_multiple_structure(
+                        new external_single_structure(
+                            array(
+                                  'id' => new external_value(PARAM_INT, 'role id'),
+                                  'shortname' => new external_value(PARAM_TEXT, 'shortname of the role'),
+                                  'localname' => new external_value(PARAM_TEXT, 'localname of the role'),
+                                 ),
+                                              'Roles in the system'
+                        ),
+                        'Roles in the system',
+                        VALUE_OPTIONAL
+                ),
             )
         );
     }
